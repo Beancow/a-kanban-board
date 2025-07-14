@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 import * as firebaseui from 'firebaseui';
 import 'firebaseui/dist/firebaseui.css';
 import { EmailAuthProvider, GoogleAuthProvider } from 'firebase/auth';
-import { firebaseAuth } from '../../../firebase-config';
-import { useAuth } from '../components/AuthProvider';
+import { firebaseAuth } from '../../../../firebase-config';
+import { useAuth } from '../../components/AuthProvider';
 import { Box, Card, Heading, Text } from '@radix-ui/themes';
 
 const uiConfig: firebaseui.auth.Config = {

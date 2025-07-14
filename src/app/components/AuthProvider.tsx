@@ -36,19 +36,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const isAuthPage = pathname === '/login';
+    const isAuthPage = pathname === '/user/login';
 
     // If user is not logged in and not on the login page, redirect to login
     if (!user && !isAuthPage) {
-      router.push('/login');
+      router.push('/user/login');
     }
     // If user is logged in and on the login page, redirect to home
     else if (user && isAuthPage) {
-      router.push('/');
+      router.push('/user');
     }
   }, [user, loading, pathname, router]);
 
-  const isAuthPage = pathname === '/login';
+  const isAuthPage = pathname === '/user/login';
   if (loading || (!user && !isAuthPage) || (user && isAuthPage)) {
     return (
       <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
