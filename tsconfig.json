@@ -12,16 +12,24 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
     "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+  "typeAcquisition": {
+    "enable": true,
+    "include": ["next", "react", "react-dom"]
   },
+  "types": ["next", "react", "react-dom"],
+  "resolveJsonModule": true,
+  "moduleResolution": "node",
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
   "exclude": ["node_modules"]
 }
