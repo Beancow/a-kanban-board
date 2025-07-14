@@ -12,6 +12,8 @@
     "csw": "npx next-pwa clear-sw"
   },
   "dependencies": {
+    "firebase": "^10.14.1",
+    "firebaseui": "^6.1.0",
     "next": "15.3.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
