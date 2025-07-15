@@ -22,7 +22,8 @@ if (!firebaseConfig.apiKey || !firebaseConfig.authDomain) {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+const auth = () => getAuth(app);
+
 const firebaseGetFirestore = () => {
   return getFirestore(app);
 }

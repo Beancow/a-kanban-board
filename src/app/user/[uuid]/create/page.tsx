@@ -1,24 +1,18 @@
+"use client";
 import Form from "next/form";
 import { createTodo } from '../../../actions'
 
 
-export default function CreateTodo() {
-    const handleSubmit = async (data: FormData) => {
-        'use server';
-
-        try {
-            const result = await createTodo(data);
-            console.log('Todo created successfully:', result.data);
-        } catch (error) {
-            console.error('Error creating todo:', error);
-        }
+export default async function CreateTodo({ params }: { params: Promise<{ uuid: string }> }) {
+    const { uuid } = await params;
+    const handleSubmit = (data: FormData) => {
+        createTodo(data, uuid);
     }
 
     return (
         <div>
             <h1>Create Todo</h1>
             <p>Fill out the form below to create a new todo item.</p>
-
         <Form action={handleSubmit}>
             <div>
                 <label htmlFor="title">Title:</label>
