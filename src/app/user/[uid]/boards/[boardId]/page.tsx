@@ -1,15 +1,17 @@
 export default async function Page({
   params,
 }: {
-  params: Promise<{ board: string }>;
+  params: Promise<{ boardId: string }>;
 }) {
-  const { board } = await params;
-  if (!board) {
+  const { boardId } = await params;
+
+  
+  if (!boardId) {
     return <div>Loading...</div>;
   }
   return (
     <div>
-      <h1>{board}</h1>
+      <h1>{boardId}</h1>
       <p>This is the user boards page content.</p>
     </div>
   );

@@ -18,12 +18,9 @@ export default function UserPage() {
             <span>
             <p>Welcome, {displayName}!</p>
             <Button variant="solid" size="2" color="green">
-                <Link href={`/user/${uid}/create`}>Create a Todo</Link>
+                <Link href={`/user/${uid}/boards`}>Go to your Boards</Link>
             </Button>
-            <Button variant="solid" size="2" color="blue">
-                <Link href={`/user/${uid}/todos`}>Go to your Todos</Link>
-            </Button>
-            <Button variant="solid" size="2" color="red" onClick={() => firebaseAuth().signOut()}>logout</Button>            
+            <Button variant="solid" size="2" color="red" onClick={() => firebaseAuth.signOut()}>logout</Button>            
             </span>
            ) : (
             <span>

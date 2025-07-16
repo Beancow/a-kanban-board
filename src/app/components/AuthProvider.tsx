@@ -1,5 +1,4 @@
 'use client';
-
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,7 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(firebaseAuth(), (user) => {
+    const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
       setUser(user);
       setLoading(false);
     });
@@ -31,24 +30,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
+  const isAuthPage = pathname === '/user/login';
+
   useEffect(() => {
     if (loading) {
       return;
     }
 
-    const isAuthPage = pathname === '/user/login';
-
-    // If user is not logged in and not on the login page, redirect to login
     if (!user && !isAuthPage) {
       router.push('/user/login');
     }
-    // If user is logged in and on the login page, redirect to home
+
     else if (user && isAuthPage) {
       router.push('/user');
     }
   }, [user, loading, pathname, router]);
 
-  const isAuthPage = pathname === '/user/login';
   if (loading || (!user && !isAuthPage) || (user && isAuthPage)) {
     return (
       <Box style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

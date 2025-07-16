@@ -13,20 +13,18 @@ const firebaseConfig = {
   publicProjectId: process.env.NEXT_PUBLIC_FIREBASE_PUBLIC_PROJECT_ID,
 };
 
-// Add a check for essential Firebase config variables.
-// This provides a more specific error message during development
-// if the .env.local file is not configured correctly.
+
 if (!firebaseConfig.apiKey || !firebaseConfig.authDomain) {
   throw new Error("Missing Firebase config values. Please check your .env.local file and ensure NEXT_PUBLIC_FIREBASE_API_KEY and NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN are set.");
 }
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const auth = () => getAuth(app);
+const firebaseAuth = getAuth(app);
 
 const firebaseGetFirestore = () => {
   return getFirestore(app);
 }
 
-export { app as firebaseApp, auth as firebaseAuth, firebaseGetFirestore };
+export { app as firebaseApp, firebaseAuth, firebaseGetFirestore };
 
