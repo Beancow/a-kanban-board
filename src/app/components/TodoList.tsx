@@ -1,5 +1,5 @@
 import { getTodos } from "@/app/actions";
-import { Button } from "@radix-ui/themes";
+import { Button, Flex } from "@radix-ui/themes";
 import Link from "next/link";
 export default async function UserTodoList({ params }: { params: Promise<{ uid: string, boardId: string }> }) {
     const { uid, boardId } = await params;
@@ -16,17 +16,17 @@ export default async function UserTodoList({ params }: { params: Promise<{ uid: 
     }
 
     return (
-        <main>
-        <Button variant="solid" size="2" color="green">
-            <Link href={`/user/${uid}/boards/${boardId}/createTodo`}>Create Todo</Link>
-        </Button>
-        <ul>
-            {todos.map((todo) => (
-                <li key={todo.id}>
-                    <a href={`/user/${uid}/boards/${boardId}/todos/${todo.id}`}>{todo.data.title}</a>
-                </li>
+        <Flex direction="column" gap="4">
+            <Button variant="solid" size="2" color="green" style={{ maxWidth: '200px' }}>
+                <Link href={`/user/${uid}/boards/${boardId}/createTodo`}>Create Todo</Link>
+            </Button>
+                {todos.map((todo) => (
+                <Button key={todo.id} variant="solid" size="2" style={{  maxWidth: '200px', textAlign: 'left' }}>
+                    <Link href={`/user/${uid}/boards/${boardId}/todos/${todo.id}`}>
+                        {todo.data.title}
+                    </Link>
+                </Button>
             ))}
-        </ul>
-        </main>
+        </Flex>
     );
 }

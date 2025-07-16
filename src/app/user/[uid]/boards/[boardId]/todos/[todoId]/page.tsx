@@ -10,8 +10,6 @@ export default async function TodoDetails({ params }: { params: Promise<{ todoId
 
     const todo = await getTodo(uid, boardId, todoId);
 
-    console.log('Todo Details:', todo);
-
     if (!todo) {
         return <div>Todo not found.</div>;
     }

@@ -1,3 +1,4 @@
+import { Button } from "@radix-ui/themes";
 import Link from "next/link";
 
 export default function Home() {
@@ -9,7 +10,9 @@ export default function Home() {
     <p>To get started, please log in to see your boards.</p>
     <p>Click on the "User" link in the navigation to access your boards.</p>
 
-    <Link href="/user">Login</Link>
+    <Button variant="solid" size="2" color="green">
+        <Link href="/user">Login</Link>
+    </Button>
     </main>
   );
 }
