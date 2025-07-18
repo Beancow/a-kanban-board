@@ -1,15 +1,25 @@
-'use client';
-import { firebaseAuth } from "firebase-config";
-import { useAuth } from "../components/AuthProvider";
+"use client";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
+import { useAppState } from "../components/AppStateProvider";
 
 export default function UserPage() {
-    const { user } = useAuth();
+    const { user, setUser } = useAppState();
+
     if (!user) {
-        return <p>Please log in to see your boards.</p>;
+        return <><p>Please log in to see your boards.</p>
+        <Button variant="solid" size="2" color="green" onClick={() => setUser({
+                    id: '1',
+                    name: 'John Doe',
+                    email: 'john.doe@example.com',
+                    photoURL: 'https://example.com/photo.jpg',
+                    currentBoardId: '1752771419502',
+                    currentOrganizationId: '1',
+                })}>Set User</Button>
+            
+        </>;
     }
-    const { uid, displayName } = user;
+    const { id: uid, name: displayName } = user;
     return (
         <div>
         <h1>{displayName ?? 'User Page'}</h1>
@@ -17,14 +27,23 @@ export default function UserPage() {
         { user ? (
             <span>
             <p>Welcome, {displayName}!</p>
+
+
             <Button variant="solid" size="2" color="green">
                 <Link href={`/user/${uid}/boards`}>Go to your Boards</Link>
             </Button>
-            <Button variant="solid" size="2" color="red" onClick={() => firebaseAuth.signOut()}>logout</Button>            
             </span>
            ) : (
-            <span>
+               <span>
             <p>Please log in to see your boards.</p>
+                <Button variant="solid" size="2" color="green" onClick={() => setUser({
+                    id: '1',
+                    name: 'John Doe',
+                    email: 'john.doe@example.com',
+                    photoURL: 'https://example.com/photo.jpg',
+                    currentBoardId: '1752771419502',
+                    currentOrganizationId: '1',
+                })}>Set User</Button>
             </span>
         )}
         </div>

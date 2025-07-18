@@ -8,7 +8,6 @@ export default function Home() {
     <h1>Welcome to Avery's Kanban Board!</h1>
     <p>This is a simple Kanban board application built with Next.js and Firebase.</p>
     <p>To get started, please log in to see your boards.</p>
-    <p>Click on the "User" link in the navigation to access your boards.</p>
 
     <Button variant="solid" size="2" color="green">
         <Link href="/user">Login</Link>

@@ -1,16 +1,20 @@
-import dynamic from "next/dynamic";
+"use client";
 
-const BoardList = dynamic(() => import('@/app/components/BoardList'), {
-    ssr: true,
-});
+import { useAppState } from "@/app/components/AppStateProvider";
 
-export default async function Page({ params }: { params: Promise<{ uid: string }> }) {
-    const { uid } = await params;
+export default function Page() {
+    const { boards } = useAppState();
+    
     return (
         <div>
             <h1>User Boards</h1>
             <p>Here you can view and manage your boards.</p>
-            <BoardList uid={uid} />
+            { boards.map((board) => (
+                <div key={board.id}>
+                    <h2>{board.title}</h2>
+                    <p>{board.description}</p>
+                </div>
+            )) }
         </div>
     );
 }
