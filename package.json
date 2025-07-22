@@ -1,30 +1,29 @@
 {
-  "name": "a-kanban-board",
-  "version": "0.1.0",
-  "private": true,
-  "description": "A Kanban board application built with Next.js and Radix UI.",
-  "author": "Avery",
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "csw": "npx next-pwa clear-sw"
-  },
-  "dependencies": {
-    "firebase": "^10.14.1",
-    "firebaseui": "^6.1.0",
-    "next": "15.3.5",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {
-    "@radix-ui/colors": "^3.0.0",
-    "@radix-ui/themes": "^3.2.1",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "radix-ui": "^1.4.2",
-    "typescript": "^5"
-  }
+    "name": "a-kanban-board",
+    "version": "0.1.0",
+    "private": true,
+    "description": "A Kanban board application built with Next.js and Radix UI.",
+    "author": "Avery",
+    "scripts": {
+        "dev": "next dev --turbopack",
+        "build": "next build",
+        "start": "next start",
+        "lint": "next lint"
+    },
+    "dependencies": {
+        "firebase": "^10.14.1",
+        "firebaseui": "^6.1.0",
+        "next": "15.3.5",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
+    },
+    "devDependencies": {
+        "@radix-ui/colors": "^3.0.0",
+        "@radix-ui/themes": "^3.2.1",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "radix-ui": "^1.4.2",
+        "typescript": "^5"
+    }
 }
