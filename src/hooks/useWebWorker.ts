@@ -144,7 +144,7 @@ export function useWebWorker() {
         };
     }, []);
 
-    const postMessage = useCallback(
+    const syncData = useCallback(
         (message: WorkerMessage) => {
             if (workerRef.current && isWorkerReady) {
                 workerRef.current.postMessage(message);
@@ -153,15 +153,6 @@ export function useWebWorker() {
             }
         },
         [isWorkerReady]
-    );
-
-    const syncData = useCallback(
-        (data: WorkerMessage) => {
-            postMessage({
-                ...data,
-            });
-        },
-        [postMessage]
     );
 
     return {
