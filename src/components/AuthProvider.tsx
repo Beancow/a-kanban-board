@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { usePathname, useRouter } from 'next/navigation';
-import { firebaseAuth } from '@/firebase-config'; // Adjust the import path as needed
+import { firebaseAuth } from '@/lib/firebase/firebase-config'; // Adjust the import path as needed
 import { Box, Spinner } from '@radix-ui/themes';
 
 interface AuthContextType {

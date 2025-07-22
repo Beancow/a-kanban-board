@@ -1,5 +1,8 @@
 'use server';
-import { firebaseGetFirestore } from '@/firebase-config';
+import {
+    firebaseGetFirestore,
+    firebaseAuth,
+} from '@/lib/firebase/firebase-config';
 import {
     doc,
     addDoc,
@@ -8,6 +11,104 @@ import {
     updateDoc,
     collection,
 } from 'firebase/firestore';
+
+const auth = firebaseAuth;
+
+async function checkPermissionInDatabase(
+    uid: string,
+    resource: string
+): Promise<boolean> {
+    const db = firebaseGetFirestore();
+    const orgDoc = doc(db, `organizations/${resource}`);
+    const orgSnapshot = await getDoc(orgDoc);
+
+    if (!orgSnapshot.exists()) {
+        return false;
+    }
+
+    const orgData = orgSnapshot.data();
+    const members: string[] = orgData.members || [];
+    return members.includes(uid);
+}
+
+export async function getUser(uid: string) {
+    const db = firebaseGetFirestore();
+    const userDoc = doc(db, `users/${uid}`);
+    const response = await getDoc(userDoc);
+
+    if (!response.exists()) {
+        throw new Error('User not found');
+    }
+
+    return {
+        success: true,
+        data: response.data(),
+    };
+}
+
+export async function updateUser(data: FormData, uid: string) {
+    const db = firebaseGetFirestore();
+    const userDoc = doc(db, `users/${uid}`);
+
+    const userData = {
+        username: data.get('username')?.valueOf(),
+        email: data.get('email')?.valueOf(),
+        displayName: data.get('displayName')?.valueOf(),
+    };
+
+    if (!userData.username || !userData.email || !userData.displayName) {
+        throw new Error('Invalid user data');
+    }
+
+    await updateDoc(userDoc, userData);
+
+    return {
+        success: true,
+        data: userData,
+    };
+}
+
+export async function checkUserPermission(params: {
+    uid: string;
+    resource: string;
+}) {
+    const { uid, resource } = params;
+    const user = auth.currentUser;
+
+    if (!user) {
+        return {
+            success: false,
+            message: 'User is not authenticated',
+        };
+    }
+
+    // Check if the user has permission to access the resource
+    const hasPermission = await checkPermissionInDatabase(uid, resource);
+    if (!hasPermission) {
+        return {
+            success: false,
+            message: 'User does not have permission to access this resource',
+        };
+    }
+
+    return {
+        success: true,
+    };
+}
+
+export async function checkAuthentication() {
+    const user = auth.currentUser;
+    if (!user) {
+        return {
+            success: false,
+            message: 'User is not authenticated',
+        };
+    }
+
+    return {
+        success: true,
+    };
+}
 
 export async function getOrgMembers(orgId: string) {
     const db = firebaseGetFirestore();
