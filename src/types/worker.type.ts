@@ -7,22 +7,22 @@ type WorkerMessage =
       }
     | {
           type: 'SYNC_USER_DATA';
-          payload: User;
+          payload: User | null;
           timestamp: string;
       }
     | {
           type: 'SYNC_BOARD_DATA';
-          payload: Boards[];
+          payload: Boards[] | Array<Boards>;
           timestamp: string;
       }
     | {
           type: 'SYNC_TODO_DATA';
-          payload: Todo[];
+          payload: Todo[] | Array<Todo>;
           timestamp: string;
       }
     | {
           type: 'SYNC_ORGANIZATION_DATA';
-          payload: Organization[];
+          payload: Organization[] | Array<Organization>;
           timestamp: string;
       }
     | {

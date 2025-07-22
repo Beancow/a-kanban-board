@@ -147,16 +147,16 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [organizations, setOrganizations] = useState<Organization[]>([]);
 
-    const loadTestData = useCallback(() => {
-        setUser(testAppState.user);
-        setBoards(testAppState.boards);
-        setTodos(testAppState.todos);
-        setOrganizations(testAppState.organizations);
-    }, []);
+    // const loadTestData = useCallback(() => {
+    //     setUser(testAppState.user);
+    //     setBoards(testAppState.boards);
+    //     setTodos(testAppState.todos);
+    //     setOrganizations(testAppState.organizations);
+    // }, []);
 
-    useEffect(() => {
-        loadTestData();
-    }, [loadTestData]);
+    // useEffect(() => {
+    //     loadTestData();
+    // }, [loadTestData]);
 
     const updateOrgMembers = useCallback(
         (orgId: string, members: OrganizationMember[]) => {

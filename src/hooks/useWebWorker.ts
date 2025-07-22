@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type WorkerMessage } from '@/types/worker.type';
-import { Boards } from '@/types/appState.type';
 
 export function useWebWorker() {
     const workerRef = useRef<Worker | null>(null);
@@ -156,45 +155,10 @@ export function useWebWorker() {
         [isWorkerReady]
     );
 
-    const syncBoardData = useCallback(
-        (data: Boards[]) => {
+    const syncData = useCallback(
+        (data: WorkerMessage) => {
             postMessage({
-                type: 'SYNC_BOARD_DATA',
-                payload: data,
-                timestamp: new Date().toISOString(),
-            });
-        },
-        [postMessage]
-    );
-
-    const syncUserData = useCallback(
-        (data: any) => {
-            postMessage({
-                type: 'SYNC_USER_DATA',
-                payload: data,
-                timestamp: new Date().toISOString(),
-            });
-        },
-        [postMessage]
-    );
-
-    const syncTodoData = useCallback(
-        (data: any) => {
-            postMessage({
-                type: 'SYNC_TODO_DATA',
-                payload: data,
-                timestamp: new Date().toISOString(),
-            });
-        },
-        [postMessage]
-    );
-
-    const syncOrganizationData = useCallback(
-        (data: any) => {
-            postMessage({
-                type: 'SYNC_ORGANIZATION_DATA',
-                payload: data,
-                timestamp: new Date().toISOString(),
+                ...data,
             });
         },
         [postMessage]
@@ -204,9 +168,6 @@ export function useWebWorker() {
         isWorkerReady,
         workerError,
         lastPayloadCount,
-        syncBoardData,
-        syncUserData,
-        syncTodoData,
-        syncOrganizationData,
+        syncData,
     };
 }

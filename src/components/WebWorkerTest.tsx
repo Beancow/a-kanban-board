@@ -1,19 +1,13 @@
 import { Button } from '@radix-ui/themes';
 import { useAppState } from './AppStateProvider';
 import { useWebWorker } from '@/hooks/useWebWorker';
+import { User } from '@/types/appState.type';
 
 export function WebWorkerTest() {
     const { user, boards, todos, organizations } = useAppState();
 
-    const {
-        isWorkerReady,
-        workerError,
-        lastPayloadCount,
-        syncUserData,
-        syncTodoData,
-        syncOrganizationData,
-        syncBoardData,
-    } = useWebWorker();
+    const { isWorkerReady, workerError, lastPayloadCount, syncData } =
+        useWebWorker();
 
     return (
         <div
@@ -50,7 +44,13 @@ export function WebWorkerTest() {
 
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <Button
-                    onClick={() => syncTodoData(todos)}
+                    onClick={() =>
+                        syncData({
+                            type: 'SYNC_TODO_DATA',
+                            payload: todos,
+                            timestamp: new Date().toISOString(),
+                        })
+                    }
                     disabled={!isWorkerReady}
                     variant='solid'
                     color='blue'
@@ -59,7 +59,13 @@ export function WebWorkerTest() {
                 </Button>
 
                 <Button
-                    onClick={() => syncUserData(user)}
+                    onClick={() =>
+                        syncData({
+                            type: 'SYNC_USER_DATA',
+                            payload: user as User | null,
+                            timestamp: new Date().toISOString(),
+                        })
+                    }
                     disabled={!isWorkerReady}
                     variant='solid'
                     color='blue'
@@ -68,7 +74,13 @@ export function WebWorkerTest() {
                 </Button>
 
                 <Button
-                    onClick={() => syncOrganizationData(organizations)}
+                    onClick={() =>
+                        syncData({
+                            type: 'SYNC_ORGANIZATION_DATA',
+                            payload: organizations,
+                            timestamp: new Date().toISOString(),
+                        })
+                    }
                     disabled={!isWorkerReady}
                     variant='solid'
                     color='blue'
@@ -77,7 +89,13 @@ export function WebWorkerTest() {
                 </Button>
 
                 <Button
-                    onClick={() => syncBoardData(boards)}
+                    onClick={() =>
+                        syncData({
+                            type: 'SYNC_BOARD_DATA',
+                            payload: boards,
+                            timestamp: new Date().toISOString(),
+                        })
+                    }
                     disabled={!isWorkerReady}
                     variant='solid'
                     color='blue'
