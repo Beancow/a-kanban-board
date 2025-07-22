@@ -29,6 +29,11 @@ export function useWebWorker() {
                 workerRef.current.onmessage = (
                     e: MessageEvent<WorkerMessage>
                 ) => {
+                    if (!e || !e.data) {
+                        console.warn('Received empty message from worker');
+                        return;
+                    }
+
                     const workerMessage = e.data;
 
                     switch (workerMessage.type) {
