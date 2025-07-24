@@ -19,17 +19,7 @@ export const organizationConverter = (): FirestoreDataConverter<
     return {
         toFirestore: (org: Organization): DocumentData => {
             return {
-                id: org.id,
-                name: org.name,
-                type: org.type,
-                members: org.members || [],
-                createdAt: org.createdAt,
-                updatedAt: org.updatedAt,
-                data: {
-                    companyName: org.data?.companyName || '',
-                    companyWebsite: org.data?.companyWebsite || '',
-                    logoURL: org.data?.logoURL || '',
-                },
+                ...org,
             };
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Organization => {
@@ -55,15 +45,7 @@ export const userConverter = (): FirestoreDataConverter<User, DocumentData> => {
     return {
         toFirestore: (user: User): DocumentData => {
             return {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                photoURL: user.photoURL || '',
-                currentBoardId: user.currentBoardId || '',
-                currentOrganizationId: user.currentOrganizationId || '',
-                allowedOrgs: user.allowedOrgs || [],
-                createdAt: user.createdAt || new Date(),
-                updatedAt: user.updatedAt || new Date(),
+                ...user,
             };
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): User => {
@@ -90,20 +72,7 @@ export const boardsConverter = (): FirestoreDataConverter<
     return {
         toFirestore: (boards: Boards): DocumentData => {
             return {
-                id: boards.id,
-                title: boards.title,
-                description: boards.description || '',
-                createdAt: boards.createdAt,
-                updatedAt: boards.updatedAt,
-                lists: boards.lists || [],
-                data: boards.data || {},
-                archived: boards.archived || false,
-                deleted: boards.deleted || false,
-                isPublic: boards.isPublic || false,
-                ownerId: boards.ownerId || '',
-                organizationId: boards.organizationId || '',
-                tags: boards.tags || [],
-                members: boards.members || [],
+                ...boards,
             };
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Boards => {
@@ -136,14 +105,7 @@ export const todoConverter = (): FirestoreDataConverter<Todo, DocumentData> => {
     return {
         toFirestore: (todo: Todo): DocumentData => {
             return {
-                id: todo.id,
-                title: todo.title,
-                description: todo.description || '',
-                completed: todo.completed,
-                createdAt: todo.createdAt,
-                updatedAt: todo.updatedAt,
-                boardId: todo.boardId,
-                userId: todo.userId,
+                ...todo,
             };
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Todo => {
@@ -169,13 +131,7 @@ export const boardListConverter = (): FirestoreDataConverter<
     return {
         toFirestore: (list: BoardList): DocumentData => {
             return {
-                id: list.id,
-                title: list.title,
-                description: list.description || '',
-                createdAt: list.createdAt,
-                updatedAt: list.updatedAt,
-                boardId: list.boardId,
-                data: list.data || {},
+                ...list,
             };
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): BoardList => {
@@ -200,13 +156,7 @@ export const organizationMemberConverter = (): FirestoreDataConverter<
     return {
         toFirestore: (member: OrganizationMember): DocumentData => {
             return {
-                id: member.id,
-                name: member.name,
-                photoURL: member.photoURL || '',
-                updatedAt: member.updatedAt,
-                createdAt: member.createdAt,
-                isAdmin: member.isAdmin || false,
-                isOwner: member.isOwner || false,
+                ...member,
             };
         },
         fromFirestore: (
