@@ -1,68 +1,55 @@
 'use server';
+import { firebaseGetFirestore } from '@/lib/firebase/firebase-config';
 import {
-    firebaseGetFirestore,
-    firebaseAuth,
-} from '@/lib/firebase/firebase-config';
-import { Organization, OrganizationMember } from '@/types/appState.type';
+    Boards,
+    Organization,
+    OrganizationMember,
+    Todo,
+    User,
+} from '@/types/appState.type';
+import { doc, addDoc, getDoc, getDocs, collection } from 'firebase/firestore';
 import {
-    doc,
-    addDoc,
-    getDoc,
-    getDocs,
-    updateDoc,
-    collection,
-} from 'firebase/firestore';
-import { organizationConverter } from './firebaseServerActionConverters';
+    boardsConverter,
+    organizationConverter,
+    organizationMemberConverter,
+    todoConverter,
+    userConverter,
+} from './firebaseServerActionConverters';
+import { todo } from 'node:test';
 
-const auth = firebaseAuth;
+const db = firebaseGetFirestore();
 
 export async function getUserAction(uid: string) {
-    const db = firebaseGetFirestore();
     const userDoc = doc(db, `users/${uid}`);
     const response = await getDoc(userDoc);
 
     if (!response.exists()) {
-        throw new Error('User not found');
-    }
-
-    return {
-        success: true,
-        data: response.data(),
-    };
-}
-
-export async function checkAuthenticationAction(): Promise<{
-    success: boolean;
-    data: {
-        uid: string;
-        email: string | null;
-        displayName: string | null;
-    } | null;
-    error?: Error;
-}> {
-    const user = auth.currentUser;
-    if (!user) {
         return {
             success: false,
             data: null,
-            error: new Error('User is not authenticated'),
+            error: new Error('User not found'),
+        };
+    }
+
+    const userData: User = response.data().withConverter(userConverter);
+
+    if (!userData) {
+        return {
+            success: false,
+            data: null,
+            error: new Error('User data is empty'),
         };
     }
 
     return {
         success: true,
-        data: {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-        },
+        data: userData,
     };
 }
 
 export async function getOrgMembersAction(
     orgId: string
 ): Promise<OrganizationMember[]> {
-    const db = firebaseGetFirestore();
     const orgDoc = doc(db, `organizations/${orgId}`);
     return getDoc(orgDoc).then((response) => {
         if (!response.exists()) {
@@ -77,140 +64,66 @@ export async function getOrgMembersAction(
 }
 
 export async function getOrganizationAction(orgId: string) {
-    const db = firebaseGetFirestore();
-
-    if (!orgId) {
-        throw new Error('Organization ID is required');
-    }
-
     const orgDoc = doc(db, `organizations/${orgId}`);
-    const response = await getDoc(orgDoc);
-
-    if (!response.exists()) {
+    try {
+        const response = await getDoc(orgDoc);
+        const organization: Organization = response
+            .data()
+            ?.withConverter(organizationConverter());
+        return {
+            success: true,
+            data: organization,
+        };
+    } catch (error) {
+        console.error('Error fetching organization:', error);
         return {
             success: false,
-            data: null,
-            error: new Error('Organization not found'),
+            error: new Error('Failed to fetch organization', { cause: error }),
         };
     }
-
-    return {
-        success: true,
-        data: response.data(),
-    };
 }
 
 export async function addMemberToOrganizationAction(data: FormData) {
-    const db = firebaseGetFirestore();
+    const orgId = data.get('orgId')?.valueOf();
+    const orgMembers = collection(db, `organizations/${orgId}-members`);
 
-    const newMember: OrganizationMember = {
-        id: data.get('uid')?.toString() || '',
-        name: data.get('name')?.toString() || '',
-        photoURL: data.get('photoURL')?.toString() || '',
-        updatedAt: new Date(),
-        createdAt: new Date(),
-        isAdmin: false,
-        isOwner: false,
-    };
-
-    const orgId = data.get('orgId')?.toString();
-
-    if (!newMember.id || !orgId) {
+    try {
+        const response = await addDoc(orgMembers, data);
+        return {
+            success: true,
+            data: response.withConverter(organizationMemberConverter()),
+        };
+    } catch (error) {
+        console.error('Error adding member to organization:', error);
         return {
             success: false,
-            data: null,
-            error: new Error('Organization ID and Member ID are required'),
+            error: new Error('Failed to add member to organization', {
+                cause: error,
+            }),
         };
     }
-
-    const orgDoc = doc(db, `organizations/${orgId}`);
-    const orgSnapshot = await getDoc(orgDoc);
-
-    if (!orgSnapshot.exists()) {
-        return {
-            success: false,
-            data: null,
-            error: new Error('Organization not found'),
-        };
-    }
-
-    const orgData = orgSnapshot.data();
-    const members: OrganizationMember[] = orgData.members || [];
-
-    if (members.every((member) => member.id !== newMember.id)) {
-        return {
-            success: false,
-            data: null,
-            error: new Error('Member already exists in the organization'),
-        };
-    }
-
-    members.push(newMember);
-
-    await updateDoc(orgDoc, { members });
-    return {
-        success: true,
-        data: { orgId, members },
-    };
 }
 
 export async function createOrganizationAction(data: FormData) {
-    const db = firebaseGetFirestore();
-
-    const orgType = data.get('type')?.toString();
-
-    const validOrgTypes = ['personal', 'company'];
-
-    const isValidOrgType = (
-        orgType: string
-    ): orgType is Organization['type'] => {
-        if (!orgType) return true;
-        if (validOrgTypes.includes(orgType)) return true;
-        return false;
-    };
-
-    if (!orgType || !isValidOrgType(orgType)) {
+    const organizations = collection(db, 'organizations').withConverter(
+        organizationConverter()
+    );
+    try {
+        const response = await addDoc(organizations, data);
+        return {
+            success: response.type === 'document',
+            data: response,
+        };
+    } catch (error) {
+        console.error('Error creating organization:', error);
         return {
             success: false,
-            data: null,
-            error: new Error('Invalid organization type'),
+            error: new Error('Failed to create organization', { cause: error }),
         };
     }
-
-    const organization: Organization = {
-        id: data.get('orgId')?.toString() || undefined,
-        name: data.get('name')?.toString() || '',
-        type: isValidOrgType(orgType) ? orgType : 'personal',
-        members: [],
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        data: {
-            companyName: data.get('companyName')?.toString() || '',
-            companyWebsite: data.get('companyWebsite')?.toString() || '',
-            logoURL: data.get('logoURL')?.toString() || '',
-        },
-    };
-
-    if (!organization.name || !organization.data?.companyName) {
-        return {
-            success: false,
-            data: null,
-            error: new Error('Invalid organization data'),
-        };
-    }
-
-    const response = await addDoc(collection(db, 'organizations'), {
-        ...organization,
-    });
-
-    return {
-        success: true,
-        data: response,
-    };
 }
 
 export async function getOrganizationListAction() {
-    const db = firebaseGetFirestore();
     const orgsCollection = collection(db, 'organizations');
 
     const orgsSnapshot = await getDocs(orgsCollection);
@@ -224,7 +137,7 @@ export async function getOrganizationListAction() {
 
     try {
         const orgsList: Organization[] = orgsSnapshot.docs.map((doc) =>
-            doc.data().withConverter(organizationConverter)
+            doc.data().withConverter(organizationConverter())
         );
         return {
             success: true,
@@ -234,7 +147,7 @@ export async function getOrganizationListAction() {
         console.error('Error fetching organizations:', error);
         return {
             success: false,
-            data: [],
+            error: new Error('Failed to fetch organizations', { cause: error }),
         };
     }
 }
@@ -244,22 +157,20 @@ export async function createTodoAction(
     uid: string,
     boardId: string
 ) {
-    const db = firebaseGetFirestore();
+    const todosCollection = collection(
+        db,
+        `users/${uid}/boards/${boardId}/todos`
+    ).withConverter(userConverter());
 
-    const todo = {
-        title: data.get('title')?.valueOf(),
-        description: data.get('description')?.valueOf(),
-        completed: false,
-    };
+    const response = await addDoc(todosCollection, data);
 
-    if (!todo.title || !todo.description) {
-        throw new Error('Invalid data');
+    if (!response) {
+        return {
+            success: false,
+            data: null,
+            error: new Error('Failed to create todo'),
+        };
     }
-
-    const response = await addDoc(
-        collection(db, `users/${uid}/boards/${boardId}/todos`),
-        { ...todo }
-    );
 
     return {
         success: true,
@@ -268,56 +179,39 @@ export async function createTodoAction(
 }
 
 export async function createBoardAction(data: FormData, uid: string) {
-    const db = firebaseGetFirestore();
+    const boardCollection = collection(db, `users/${uid}/boards`).withConverter(
+        boardsConverter()
+    );
+    try {
+        const response = await addDoc(boardCollection, data);
 
-    const board = {
-        title: data.get('title')?.valueOf(),
-        description: data.get('description')?.valueOf(),
-    };
+        const newBoard = response.id;
 
-    if (!board.title || !board.description) {
-        throw new Error('Invalid data');
-    }
-
-    const response = await addDoc(collection(db, `users/${uid}/boards`), {
-        ...board,
-    });
-
-    if (!response) {
+        return {
+            success: true,
+            data: { ...response, id: newBoard },
+        };
+    } catch (error) {
+        console.error('Error creating board:', error);
         return {
             success: false,
-            data: null,
-            error: new Error('Failed to create board'),
+            error: new Error('Failed to create board', { cause: error }),
         };
     }
-
-    return {
-        success: true,
-        data: response,
-    };
 }
 
 export async function getTodosAction(uid: string, boardId: string) {
-    const db = firebaseGetFirestore();
     const todosCollection = collection(
         db,
         `users/${uid}/boards/${boardId}/todos`
     );
+
     try {
         const todosSnapshot = await getDocs(todosCollection);
 
-        const todosList = todosSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            data: doc.data(),
-        }));
-        if (!todosList || todosList.length === 0) {
-            return {
-                success: false,
-                data: [],
-                error: 'No todos found',
-            };
-        }
-
+        const todosList: Todo[] = todosSnapshot.docs.map((doc) =>
+            doc.data().withConverter(todoConverter())
+        );
         return {
             success: true,
             data: todosList,
@@ -326,38 +220,32 @@ export async function getTodosAction(uid: string, boardId: string) {
         console.error('Error fetching todos:', error);
         return {
             success: false,
-            data: [],
-            error: Error(
-                error instanceof Error ? error.message : 'Unknown error',
-                {
-                    cause: error,
-                }
-            ),
+            error: new Error('Failed to fetch todos'),
         };
     }
 }
 
 export async function getBoardsAction(username: string) {
-    const db = firebaseGetFirestore();
     const boardsCollection = collection(db, `users/${username}/boards`);
-    const boardsSnapshot = await getDocs(boardsCollection);
-    const boardsList = boardsSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        data: doc.data(),
-    }));
 
-    if (!boardsList || boardsList.length === 0) {
+    try {
+        const boardsSnapshot = await getDocs(boardsCollection);
+
+        const boardsList: Boards[] = boardsSnapshot.docs.map((doc) =>
+            doc.data().withConverter(boardsConverter())
+        );
+
+        return {
+            success: true,
+            data: boardsList,
+        };
+    } catch (error) {
+        console.error('Error fetching boards:', error);
         return {
             success: false,
-            data: [],
-            error: 'No boards found',
+            error: new Error('Failed to fetch boards', { cause: error }),
         };
     }
-
-    return {
-        success: true,
-        data: boardsList,
-    };
 }
 
 export async function getTodoAction(
@@ -365,34 +253,20 @@ export async function getTodoAction(
     boardId: string,
     todoId: string
 ) {
-    const db = firebaseGetFirestore();
-    try {
-        if (!todoId) {
-            throw new Error('Todo ID is required');
-        }
-        const todoDoc = doc(
-            db,
-            `users/${uid}/boards/${boardId}/todos/${todoId}`
-        );
-        const response = await getDoc(todoDoc);
+    const todoDoc = doc(db, `users/${uid}/boards/${boardId}/todos/${todoId}`);
 
-        if (!response.exists()) {
-            return {
-                success: false,
-                data: null,
-                error: 'Todo not found',
-            };
-        }
+    try {
+        const response = await getDoc(todoDoc);
+        const todo: Todo = response.data()?.withConverter(todoConverter());
         return {
             success: true,
-            data: response.data(),
-            error: null,
+            data: todo,
         };
     } catch (error) {
+        console.error('Error fetching todo:', error);
         return {
             success: false,
-            data: null,
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: new Error('Failed to fetch todo', { cause: error }),
         };
     }
 }

@@ -12,17 +12,23 @@ import {
     QueryDocumentSnapshot,
 } from 'firebase/firestore';
 
-export const organizationConverter = (
-    isNew?: boolean
-): FirestoreDataConverter<Organization, DocumentData> => {
+export function organizationConverter(): FirestoreDataConverter<
+    Organization | FormData,
+    DocumentData
+> {
     const newDate = new Date().toISOString();
-
     return {
-        toFirestore: (org: Organization): DocumentData => {
+        toFirestore(organization: FormData): DocumentData {
+            const formData = Object.fromEntries(organization.entries());
             return {
-                ...org,
-                createdAt: isNew ? newDate : org.createdAt,
+                ...formData,
+                createdAt: formData.createdAt || newDate,
                 updatedAt: newDate,
+                data: {
+                    companyName: formData.companyName || '',
+                    companyWebsite: formData.companyWebsite || '',
+                    logoURL: formData.logoURL || '',
+                },
             };
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Organization => {
@@ -43,17 +49,19 @@ export const organizationConverter = (
             };
         },
     };
-};
+}
 
-export const userConverter = (
-    isNew?: boolean
-): FirestoreDataConverter<User, DocumentData> => {
+export function userConverter(): FirestoreDataConverter<
+    User | FormData,
+    DocumentData
+> {
     const newDate = new Date().toISOString();
     return {
-        toFirestore: (user: User): DocumentData => {
+        toFirestore: (user: FormData): DocumentData => {
+            const formData = Object.fromEntries(user.entries());
             return {
-                ...user,
-                createdAt: isNew ? newDate : user.createdAt,
+                ...formData,
+                createdAt: formData.createdAt || newDate,
                 updatedAt: newDate,
             };
         },
@@ -73,17 +81,19 @@ export const userConverter = (
             };
         },
     };
-};
+}
 
-export const boardsConverter = (
-    isNew?: boolean
-): FirestoreDataConverter<Boards, DocumentData> => {
+export function boardsConverter(): FirestoreDataConverter<
+    Boards | FormData,
+    DocumentData
+> {
     const newDate = new Date().toISOString();
     return {
-        toFirestore: (boards: Boards): DocumentData => {
+        toFirestore: (boards: FormData): DocumentData => {
+            const formData = Object.fromEntries(boards.entries());
             return {
-                ...boards,
-                createdAt: isNew ? newDate : boards.createdAt,
+                ...formData,
+                createdAt: formData.createdAt || newDate,
                 updatedAt: newDate,
             };
         },
@@ -112,17 +122,19 @@ export const boardsConverter = (
             };
         },
     };
-};
+}
 
-export const todoConverter = (
-    isNew?: boolean
-): FirestoreDataConverter<Todo, DocumentData> => {
+export function todoConverter(): FirestoreDataConverter<
+    Todo | FormData,
+    DocumentData
+> {
     const newDate = new Date().toISOString();
     return {
-        toFirestore: (todo: Todo): DocumentData => {
+        toFirestore: (todo: FormData): DocumentData => {
+            const formData = Object.fromEntries(todo.entries());
             return {
-                ...todo,
-                createdAt: isNew ? newDate : todo.createdAt,
+                ...formData,
+                createdAt: formData.createdAt || newDate,
                 updatedAt: newDate,
             };
         },
@@ -141,17 +153,19 @@ export const todoConverter = (
             };
         },
     };
-};
+}
 
-export const boardListConverter = (
-    isNew?: boolean
-): FirestoreDataConverter<BoardList, DocumentData> => {
+export function boardListConverter(): FirestoreDataConverter<
+    BoardList | FormData,
+    DocumentData
+> {
     const newDate = new Date().toISOString();
     return {
-        toFirestore: (list: BoardList): DocumentData => {
+        toFirestore: (list: FormData): DocumentData => {
+            const formData = Object.fromEntries(list.entries());
             return {
-                ...list,
-                createdAt: isNew ? newDate : list.createdAt,
+                ...formData,
+                createdAt: formData.createdAt || newDate,
                 updatedAt: newDate,
             };
         },
@@ -169,16 +183,20 @@ export const boardListConverter = (
             };
         },
     };
-};
+}
 
-export const organizationMemberConverter = (): FirestoreDataConverter<
-    OrganizationMember,
+export function organizationMemberConverter(): FirestoreDataConverter<
+    OrganizationMember | FormData,
     DocumentData
-> => {
+> {
+    const newDate = new Date().toISOString();
     return {
-        toFirestore: (member: OrganizationMember): DocumentData => {
+        toFirestore: (member: FormData): DocumentData => {
+            const formData = Object.fromEntries(member.entries());
             return {
-                ...member,
+                ...formData,
+                createdAt: formData.createdAt || newDate,
+                updatedAt: newDate,
             };
         },
         fromFirestore: (
@@ -197,4 +215,4 @@ export const organizationMemberConverter = (): FirestoreDataConverter<
             };
         },
     };
-};
+}

@@ -3,6 +3,7 @@ import {
     firebaseGetFirestore,
     firebaseAuth,
 } from '@/lib/firebase/firebase-config';
+import { organizationConverter } from '@/lib/firebase/firebaseServerActionConverters';
 import {
     doc,
     addDoc,
@@ -146,23 +147,13 @@ export async function addMemberToOrganization(data: FormData) {
 
     const orgId = data.get('orgId')?.valueOf();
     const memberId = data.get('memberId')?.valueOf();
-    if (!orgId || !memberId) {
-        throw new Error('Organization ID and Member ID are required');
-    }
 
     const orgDoc = doc(db, `organizations/${orgId}`);
     const orgSnapshot = await getDoc(orgDoc);
 
-    if (!orgSnapshot.exists()) {
-        throw new Error('Organization not found');
-    }
-
-    const orgData = orgSnapshot.data();
-    const members = orgData.members || [];
-
-    if (members.includes(memberId)) {
-        throw new Error('Member already exists in the organization');
-    }
+    const members = orgSnapshot
+        .data()
+        ?.withConverter(organizationConverter).members;
 
     members.push(memberId);
 
