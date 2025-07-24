@@ -74,7 +74,7 @@ type OrganizationMember = {
 };
 
 type Organization = {
-    id: string;
+    id?: string;
     name: string;
     type: 'personal' | 'company';
     members: OrganizationMember[];
