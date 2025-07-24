@@ -27,8 +27,9 @@ export const organizationConverter = (
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Organization => {
             const data = snapshot.data();
+            const docId = snapshot.ref.id;
             return {
-                id: data.id,
+                id: docId,
                 name: data.name,
                 type: data.type,
                 members: data.members || [],
@@ -58,8 +59,9 @@ export const userConverter = (
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): User => {
             const data = snapshot.data();
+            const docId = snapshot.ref.id;
             return {
-                id: data.id,
+                id: docId,
                 name: data.name,
                 email: data.email,
                 photoURL: data.photoURL || '',
@@ -87,8 +89,9 @@ export const boardsConverter = (
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Boards => {
             const data = snapshot.data();
+            const docId = snapshot.ref.id;
             return {
-                id: data.id,
+                id: docId,
                 title: data.title,
                 tags: data.tags || [],
                 ownerId: data.ownerId || '',
@@ -125,8 +128,9 @@ export const todoConverter = (
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): Todo => {
             const data = snapshot.data();
+            const docId = snapshot.ref.id;
             return {
-                id: data.id,
+                id: docId,
                 title: data.title,
                 description: data.description || '',
                 completed: data.completed || false,
@@ -153,8 +157,9 @@ export const boardListConverter = (
         },
         fromFirestore: (snapshot: QueryDocumentSnapshot): BoardList => {
             const data = snapshot.data();
+            const docId = snapshot.ref.id;
             return {
-                id: data.id,
+                id: docId,
                 title: data.title,
                 description: data.description || '',
                 createdAt: new Date(data.createdAt),
@@ -180,8 +185,9 @@ export const organizationMemberConverter = (): FirestoreDataConverter<
             snapshot: QueryDocumentSnapshot
         ): OrganizationMember => {
             const data = snapshot.data();
+            const docId = snapshot.ref.id;
             return {
-                id: data.id,
+                id: docId,
                 name: data.name,
                 photoURL: data.photoURL || '',
                 updatedAt: new Date(data.updatedAt),
